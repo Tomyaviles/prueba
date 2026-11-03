@@ -60,6 +60,16 @@ class TestComportamiento(unittest.TestCase):
     def test_eliminar(self):
         self.probar_caso("eliminar")
 
+    def test_archivo_danado_no_se_pisa(self):
+        with tempfile.TemporaryDirectory() as carpeta_datos:
+            ruta = os.path.join(carpeta_datos, "datos.json")
+            with open(ruta, "w", encoding="utf-8") as f:
+                f.write("{esto no es json")
+            salida = correr("registro_y_prioridad", carpeta_datos)
+            self.assertIn("No se pudo leer datos.json", salida)
+            with open(ruta, encoding="utf-8") as f:
+                self.assertEqual(f.read(), "{esto no es json")
+
     def test_persistencia(self):
         # dos ejecuciones sobre el mismo datos.json: la segunda tiene que ver lo de la primera
         with tempfile.TemporaryDirectory() as carpeta_datos:
