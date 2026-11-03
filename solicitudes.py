@@ -4,8 +4,62 @@
 import json
 import os
 from datetime import datetime
+from enum import Enum, IntEnum
 
 ARCHIVO = "datos.json"
+
+
+class Estado(Enum):
+    PENDIENTE = "P"
+    EN_PROCESO = "E"
+    RESUELTA = "R"
+    CERRADA = "C"
+    RECHAZADA = "X"
+
+
+NOMBRES_ESTADO = {
+    Estado.PENDIENTE: "Pendiente",
+    Estado.EN_PROCESO: "En proceso",
+    Estado.RESUELTA: "Resuelta",
+    Estado.CERRADA: "Cerrada",
+    Estado.RECHAZADA: "Rechazada",
+}
+
+# a que estados se puede pasar desde cada estado
+TRANSICIONES = {
+    Estado.PENDIENTE: {Estado.EN_PROCESO, Estado.RECHAZADA},
+    Estado.EN_PROCESO: {Estado.RESUELTA, Estado.RECHAZADA},
+    Estado.RESUELTA: {Estado.CERRADA},
+    Estado.CERRADA: set(),
+    Estado.RECHAZADA: set(),
+}
+
+ESTADOS_FINALES = {Estado.CERRADA, Estado.RECHAZADA}
+
+
+class Prioridad(IntEnum):
+    BAJA = 1
+    MEDIA = 2
+    ALTA = 3
+
+
+NOMBRES_PRIORIDAD = {
+    Prioridad.BAJA: "Baja",
+    Prioridad.MEDIA: "Media",
+    Prioridad.ALTA: "Alta",
+}
+
+# el orden de este diccionario es el orden en que se muestran los tipos
+PRIORIDAD_POR_TIPO = {
+    "Certificado": Prioridad.BAJA,
+    "Equivalencia": Prioridad.MEDIA,
+    "Reclamo de nota": Prioridad.ALTA,
+    "Cambio de comision": Prioridad.MEDIA,
+    "Otro": Prioridad.BAJA,
+}
+
+TIPOS = list(PRIORIDAD_POR_TIPO)
+PALABRA_URGENTE = "urgente"
 
 
 def guardar(d):
@@ -38,52 +92,37 @@ def cargar():
         return {"estudiantes": [], "responsables": [], "solicitudes": []}
 
 
-def nom_est(e):
-    if e == "P":
-        return "Pendiente"
-    elif e == "E":
-        return "En proceso"
-    elif e == "R":
-        return "Resuelta"
-    elif e == "C":
-        return "Cerrada"
-    elif e == "X":
-        return "Rechazada"
-    else:
+def estado_desde_codigo(codigo):
+    try:
+        return Estado(codigo)
+    except ValueError:
+        return None
+
+
+def nom_est(codigo):
+    estado = estado_desde_codigo(codigo)
+    if estado is None:
         return "?"
+    return NOMBRES_ESTADO[estado]
 
 
 def nom_prio(p):
-    if p == 1:
-        return "Baja"
-    if p == 2:
-        return "Media"
-    if p == 3:
-        return "Alta"
-    return "?"
+    try:
+        return NOMBRES_PRIORIDAD[Prioridad(p)]
+    except ValueError:
+        return "?"
 
 
 def calcular_prioridad(tipo, desc):
-    if tipo == "Reclamo de nota":
-        p = 3
-    elif tipo == "Equivalencia":
-        p = 2
-    elif tipo == "Cambio de comision":
-        p = 2
-    elif tipo == "Certificado":
-        p = 1
-    else:
-        p = 1
-    if "urgente" in desc.lower():
-        p = 3
-    return p
+    if PALABRA_URGENTE in desc.lower():
+        return Prioridad.ALTA
+    return PRIORIDAD_POR_TIPO.get(tipo, Prioridad.BAJA)
 
 
 class Sistema:
 
     def __init__(self):
         self.d = cargar()
-        self.tipos = ["Certificado", "Equivalencia", "Reclamo de nota", "Cambio de comision", "Otro"]
 
     def menu(self):
         while True:
@@ -157,7 +196,7 @@ class Sistema:
         p = calcular_prioridad(tipo, desc)
         id = len(self.d["solicitudes"]) + 1
         fecha = datetime.now().strftime("%d/%m/%Y")
-        self.agregar(id, leg, est["nombre"], est["apellido"], tipo, desc, p, "P", None, fecha)
+        self.agregar(id, leg, est["nombre"], est["apellido"], tipo, desc, int(p), Estado.PENDIENTE.value, None, fecha)
         print("Solicitud registrada con ID " + str(id) + " - Prioridad: " + nom_prio(p))
 
     def registrar_estudiante(self, leg):
@@ -181,17 +220,17 @@ class Sistema:
 
     def pedir_tipo(self):
         print("Tipos de solicitud:")
-        for i in range(len(self.tipos)):
-            print(str(i + 1) + ". " + self.tipos[i])
+        for i in range(len(TIPOS)):
+            print(str(i + 1) + ". " + TIPOS[i])
         try:
             t = int(input("Tipo: "))
         except:
             print("error")
             return None
-        if t < 1 or t > 5:
+        if t < 1 or t > len(TIPOS):
             print("Tipo invalido")
             return None
-        return self.tipos[t - 1]
+        return TIPOS[t - 1]
 
     def pedir_descripcion(self):
         desc = input("Descripcion: ")
@@ -227,23 +266,14 @@ class Sistema:
         print("Estado actual: " + nom_est(s["estado"]))
         print("P=Pendiente, E=En proceso, R=Resuelta, C=Cerrada, X=Rechazada")
         n = input("Nuevo estado: ").upper()
-        ok = False
-        if s["estado"] == "P":
-            if n == "E":
-                if s["resp"] == None:
-                    print("No se puede pasar a En proceso sin responsable asignado")
-                    return
-                ok = True
-            elif n == "X":
-                ok = True
-        elif s["estado"] == "E":
-            if n == "R" or n == "X":
-                ok = True
-        elif s["estado"] == "R":
-            if n == "C":
-                ok = True
+        actual = Estado(s["estado"])
+        nuevo = estado_desde_codigo(n)
+        ok = nuevo in TRANSICIONES[actual]
+        if ok and nuevo == Estado.EN_PROCESO and s["resp"] == None:
+            print("No se puede pasar a En proceso sin responsable asignado")
+            return
         if ok:
-            s["estado"] = n
+            s["estado"] = nuevo.value
             guardar(self.d)
             print("Estado actualizado a " + nom_est(n))
         else:
@@ -258,7 +288,7 @@ class Sistema:
         if s == None:
             print("No existe la solicitud")
             return
-        if s["estado"] == "C" or s["estado"] == "X":
+        if Estado(s["estado"]) in ESTADOS_FINALES:
             print("No se puede asignar responsable a una solicitud finalizada")
             return
         for r in self.d["responsables"]:
@@ -321,37 +351,21 @@ class Sistema:
         print("--- Reporte de solicitudes ---")
         sols = self.d["solicitudes"]
         print("Total de solicitudes: " + str(len(sols)))
-        p = 0
-        e = 0
-        r = 0
-        c = 0
-        x = 0
+        cantidad = {estado: 0 for estado in Estado}
         for s in sols:
-            if s["estado"] == "P":
-                p = p + 1
-            elif s["estado"] == "E":
-                e = e + 1
-            elif s["estado"] == "R":
-                r = r + 1
-            elif s["estado"] == "C":
-                c = c + 1
-            elif s["estado"] == "X":
-                x = x + 1
+            cantidad[Estado(s["estado"])] += 1
         print("Por estado:")
-        print("  Pendiente: " + str(p))
-        print("  En proceso: " + str(e))
-        print("  Resuelta: " + str(r))
-        print("  Cerrada: " + str(c))
-        print("  Rechazada: " + str(x))
+        for estado in Estado:
+            print("  " + NOMBRES_ESTADO[estado] + ": " + str(cantidad[estado]))
         # alertas
         al = []
         for s in sols:
-            if s["prioridad"] == 3 and s["resp"] == None and s["estado"] == "P":
+            if s["prioridad"] == Prioridad.ALTA and s["resp"] == None and s["estado"] == Estado.PENDIENTE.value:
                 al.append(s)
         if len(al) > 0:
             print("ALERTA: " + str(len(al)) + " solicitud(es) de prioridad alta sin responsable: " + ", ".join(["#" + str(s["id"]) for s in al]))
         if len(sols) > 0:
-            pct = (r + c) * 100 / len(sols)
+            pct = (cantidad[Estado.RESUELTA] + cantidad[Estado.CERRADA]) * 100 / len(sols)
             print("Porcentaje resueltas/cerradas: " + str(round(pct, 1)) + "%")
 
     def eliminar(self):
