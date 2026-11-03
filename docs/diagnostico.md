@@ -4,8 +4,9 @@ Versión analizada: tag `estado-inicial`, archivo `solicitudes.py` (356 líneas,
 
 ## 1. Calidad externa vs. calidad interna (Etapa 2)
 
-1. Calidad Externa (La mirada del usuario)
-La calidad externa se refiere a cómo se comporta el software ante los ojos de los usuarios finales (en este caso, el personal administrativo que gestiona las solicitudes académicas). Desde esta perspectiva, el sistema funciona correctamente y cumple con los requerimientos planteados:
+### 1.1 Calidad externa (la mirada del usuario)
+
+La calidad externa se refiere a cómo se comporta el software ante los ojos de los usuarios finales (en este caso, el personal administrativo que gestiona las solicitudes académicas). Desde esta perspectiva, el sistema en general funciona y cumple con los requerimientos planteados (la única falla visible que encontramos es la del Smell 2: un estudiante queda dado de alta aunque su solicitud no se cree):
 
 - **Flujo completo de negocio**: El menú interactivo permite realizar todas las operaciones esperadas: registrar estudiantes (con validaciones básicas de email y campos vacíos), crear solicitudes, asignar prioridades automáticas (según el tipo o la palabra clave "urgente"), cambiar estados mediante una máquina de estados controlada (Pendiente -> En Proceso -> Resuelta -> Cerrada), asignar responsables, filtrar, emitir reportes con estadísticas y eliminar registros.
 
@@ -14,19 +15,17 @@ La calidad externa se refiere a cómo se comporta el software ante los ojos de l
 - **Experiencia interactiva inmediata**: La interfaz de consola es directa y proporciona realimentación textual clara de lo que va ocurriendo en cada paso.
 
 
-2. Calidad Interna(La mirada del desarrollador)
+### 1.2 Calidad interna (la mirada del desarrollador)
 
 La calidad interna abarca la arquitectura del código, su diseño, legibilidad y mantenibilidad. Desde esta perspectiva, el código presenta importantes deficiencias y deudas técnicas:
 
- - **Acoplamiento extremo (UI y Lógica mezcladas)**: Toda la lógica de negocio, validaciones y reglas de transición de estados están fuertemente acopladas con las operaciones de E/S de consola (input() y print()). No hay separación de responsabilidades.
+- **Acoplamiento extremo (UI y Lógica mezcladas)**: Toda la lógica de negocio, validaciones y reglas de transición de estados están fuertemente acopladas con las operaciones de E/S de consola (input() y print()). No hay separación de responsabilidades.
 
 - **Nombres crípticos y legibilidad reducida**: Se utilizan variables de una sola letra (d, e, f, s, al, rid, t, leg), lo que dificulta la lectura y comprensión del código por otros desarrolladores (o por el mismo autor tiempo después).
 
-- **Código muerto**: Se declara una variable global cont = 0  # contador de solicitudes al inicio del script que jamás se utiliza en todo el programa.
+- **Código muerto**: Se declara una variable global `cont = 0  # contador de solicitudes` al inicio del script que jamás se utiliza en todo el programa.
 
-
-3. Relación: Funcionalidad Visible vs. Mantenibilidad, Legibilidad y Evolución Futura
-
+### 1.3 Relación: funcionalidad visible vs. mantenibilidad, legibilidad y evolución futura
 
 - **Legibilidad y Mantenibilidad**: Al carecer de una estructura modular (clases especializadas, separación entre modelos de datos, persistencia y vistas), cualquier modificación simple —como cambiar el formato de la fecha, agregar un nuevo campo al estudiante o modificar la regla de una prioridad— requiere modificar funciones extensas donde todo está mezclado. Esto aumenta drásticamente el riesgo de introducir bugs colaterales.
 
@@ -49,12 +48,12 @@ Criterio de prioridad:
 | 4 | Código duplicado | guardado del JSON, búsqueda por ID | Alta |
 | 5 | Magic strings / magic numbers | estados, prioridades, cantidad de tipos | Media |
 | 6 | Cadenas de if/elif (viola OCP) | prioridad por tipo, transiciones, nombres de estado | Media |
-| 7 | Manejo de Exepciones silencioso |cargar(), reg_sol(),cambiar_estado(),asignar(),eliminar() | Alta |
-| 8 | Nombres pobres de variables |Presente en todo el script (ej. cargar(),menu(),filtrar()) | Media |
-| 9 | Primitive Obssesion | En todo el sistema | Alta |
-| 10 | Acoplamiento fuerte al almacenamiento fisico | cargar(),agregar(),cambiar_estado(),etc | Media |
-| 11 | Código muerto (Dead Code) | Línea 7 del código original. | Baja |
-| 12 | Desnormalización y duplicación de datos | Método agregar() | Media |
+| 7 | Manejo de excepciones silencioso | `except:` genérico en `cargar` (34), `reg_sol` (130), `cambiar_estado` (181), `asignar` (222, 239), `filtrar` (286, 292), `eliminar` (338) | Alta |
+| 8 | Nombres pobres | `d`, `x`, `s`, `al`, `enc`, `e`/`t`/`p`/`r`, en todo el archivo | Media |
+| 9 | Primitive Obsession | entidades como diccionarios en todo el sistema | Alta |
+| 10 | Acoplamiento al almacenamiento físico | `json.load`/`json.dump` en `cargar`, `agregar`, `cambiar_estado`, `asignar`, `eliminar` | Media |
+| 11 | Código muerto | variable global `cont` (línea 9) | Baja |
+| 12 | Datos duplicados (desnormalización) | `nombre_est` en `agregar` (163) | Media |
 
 ---
 
@@ -225,73 +224,107 @@ c) Buscar un responsable por ID se repite en `asignar` (243) y en `buscar` (269)
 
 ---
 
-### Smells 7 Manejo de Exepciones silencioso
+### Smell 7: Manejo de excepciones silencioso
 
-**Ubicación:** Funciones cargar(), reg_sol(), cambiar_estado(), asignar() y filtrar().
+**Ubicación:** `cargar` (línea 34), `reg_sol` (130), `cambiar_estado` (181), `asignar` (222 y 239), `filtrar` (286 y 292) y `eliminar` (338).
 
-**Evidencia:** Uso de bloques except: vacíos o sin especificar el tipo de excepción (ej. except: en cargar()), lo cual captura incluso interrupciones del sistema (KeyboardInterrupt), además de ocultar errores en filtrar() mediante pass.
+**Evidencia:** todos usan `except:` sin indicar el tipo de excepción, lo que captura incluso interrupciones del sistema (`KeyboardInterrupt`). En `cargar` cualquier problema con el archivo solo imprime `"error"` y devuelve datos vacíos. En `filtrar` el error directamente se ignora con `pass`:
 
-**Impacto:** Enmascara fallos reales de programación o corrupción de archivos, dificultando el debugging y provocando comportamientos erráticos silenciosos.
+```python
+            if p != "":
+                try:
+                    if s["prioridad"] != int(p):
+                        continue
+                except:
+                    pass
+```
 
-**Prioridad:** Alta. Se corrige capturando excepciones especificas, y si ocurren errores debe informarse al usuario o registrarse(log)
+Si el usuario escribe `alta` en vez de `3`, el filtro por prioridad se ignora sin avisar y se muestran todas las solicitudes.
 
-### Smells 8 Nombres pobres de variables
+**Impacto:** enmascara fallos reales de programación o corrupción de archivos (si `datos.json` está dañado, el sistema arranca vacío y al guardar lo pisa), dificultando el debugging y provocando comportamientos erráticos silenciosos.
 
-**Ubicacion:** Presente en todo el script (ej. cargar(), menu(), filtrar()).
+**Riesgo de mantenimiento:** alto.
 
-**Evidencia:** Uso masivo de identificadores crípticos o abreviados como d (para los datos globales), x / x2 (para iteraciones), al (para alertas), enc (bandera de encontrado) y id.
+**Prioridad:** Alta. Se corrige capturando excepciones específicas (`ValueError`, `json.JSONDecodeError`, `OSError`) e informando el error al usuario o registrándolo en un log.
 
+---
 
-**Impacto:** Dificulta severamente la lectura, comprensión y legibilidad del código. Obliga al desarrollador a retener en mente el contexto de abreviaturas ambiguas
+### Smell 8: Nombres pobres
 
+**Ubicación:** en todo el archivo.
 
-**Prioridad:** Media. A medida que crezca el código, las variables genéricas causarán confusión y errores por colisión de nombres. Pero se corrige cambiando el nombre de las variables y asignandoles nombres mas especificos para su funcion o lo que guardan.
+**Evidencia:** uso masivo de identificadores crípticos o abreviados: `d` (los datos globales), `x` y `s` (para iterar), `al` (alertas, línea 324), `enc` (bandera de encontrado, línea 242), `e`, `t`, `p`, `r` (parámetros de `filtrar`), `n`, `a`, `c`, `em` (datos del estudiante en `reg_sol`). Además se usa `id` como variable, que tapa la función `id()` de Python.
 
+**Impacto:** dificulta la lectura y comprensión del código. Obliga al desarrollador a retener en mente el significado de abreviaturas ambiguas (por ejemplo, `c` es "carrera" en `reg_sol` pero "cantidad de cerradas" en `reporte`).
 
+**Riesgo de mantenimiento:** medio. A medida que crezca el código, los nombres genéricos causan confusión y errores por colisión de nombres.
 
-### Smells 9 Primitive Obsession
+**Prioridad:** Media. Se corrige con Rename Variable, usando nombres específicos según lo que guarda cada variable.
 
-**Ubicación:** En todo el sistema (manipulación directa de claves como s["estado"], s["resp"], etc.)
+---
 
-**Evidencia:** Las entidades del dominio (estudiantes, responsables, solicitudes) se manejan como diccionarios puros basados en claves de texto plano en lugar de clases u objetos tipados con métodos propios.
+### Smell 9: Primitive Obsession
 
-**Impacto:** Alto acoplamiento a estructuras de datos primitivas, propenso a errores tipográficos, ausencia de autocompletado y validación de tipos tardía.
+**Ubicación:** en todo el sistema (acceso directo a claves como `s["estado"]`, `s["resp"]`, `est["nombre"]`).
 
-**Prioridad de corrección:** Alta.
+**Evidencia:** las entidades del dominio (estudiantes, responsables, solicitudes) se manejan como diccionarios con claves de texto en lugar de clases con atributos y métodos propios. El estado es una letra y la prioridad un número (ver Smell 5).
 
+**Impacto:** alto acoplamiento a estructuras de datos primitivas, propenso a errores de tipeo en las claves (un `s["estdo"]` recién falla al ejecutarse), sin autocompletado y con validación de tipos tardía. Las reglas que pertenecen a una solicitud (qué transiciones admite, si se le puede asignar responsable) no tienen un lugar propio y terminan en la God Class (Smell 1).
 
-### Smells 10 Acoplamiento fuerte al almacenamiento fisico
+**Riesgo de mantenimiento:** alto.
 
-**Ubicación:** Funciones cargar(), agregar(), cambiar_estado(), asignar(), eliminar().
+**Prioridad:** Alta. Se corrige creando clases del modelo (`Estudiante`, `Responsable`, `Solicitud`) y `Enum` para estado y prioridad.
 
-**Evidencia:** La lógica de negocio y las funciones de interfaz interactúan de manera directa con operaciones de archivos de texto plano mediante json.load() y json.dump(), sin ninguna abstracción o capa de repositorio de datos.
+---
 
-**Impacto:** Imposibilita la migración a otro sistema de persistencia (como una base de datos relacional) sin reescribir prácticamente toda la aplicación.
+### Smell 10: Acoplamiento al almacenamiento físico
 
-**Prioridad de corrección:** Meida.
+**Ubicación:** `cargar` (`json.load` en línea 31), `agregar` (174), `cambiar_estado` (212), `asignar` (252) y `eliminar` (347).
 
-### Smells 11 Codigo muerto (Dead Code)
+**Evidencia:** la lógica de negocio y la interfaz trabajan directamente con el archivo mediante `json.load()` y `json.dump()`, sin ninguna abstracción o capa de repositorio. A diferencia del Smell 4, que señala que el código de guardado está repetido, acá el problema es de diseño: aunque el guardado estuviera en un solo método, seguiría dentro de la misma clase que maneja la consola y las reglas.
 
-**Ubicación:** Línea 7 del código original.
+**Impacto:** imposibilita migrar a otro sistema de persistencia (como una base de datos relacional) sin reescribir prácticamente toda la aplicación. Tampoco se pueden probar las reglas de negocio sin escribir en disco. Viola DIP: las reglas dependen de un detalle concreto (el archivo JSON) en vez de una abstracción.
 
-**Evidencia:** Declaración de la variable global cont = 0  # contador de solicitudes, la cual nunca se lee ni se modifica en ninguna parte del script.
+**Riesgo de mantenimiento:** medio.
 
-**Impacto:** Genera ruido visual y confusión en quien lee el código, haciéndole creer que existe un mecanismo contador activo.
+**Prioridad:** Media. Se corrige con una clase repositorio que encapsule la carga y el guardado.
 
-**Prioridad de corrección:** Baja. Se corrige dandole una funcionalidad a la variable o eliminandola si su uso no es necesario.
+---
 
+### Smell 11: Código muerto
 
-### Smells 12 Desnormalización y duplicación de datos
+**Ubicación:** línea 9.
 
-**Ubicación:** Método agregar().
+**Evidencia:**
 
-**Evidencia:** El nombre completo del estudiante ("nombre_est": nom + " " + ape) se almacena duplicado dentro de cada solicitud en lugar de resolverse dinámicamente mediante la relación con el legajo del estudiante.
+```python
+cont = 0  # contador de solicitudes
+```
 
-**Impacto:** Si un estudiante actualiza sus datos personales (nombre o apellido), las solicitudes históricas mantendrán el nombre viejo, generando inconsistencia de datos.
+La variable nunca se lee ni se modifica en ninguna parte del script. El ID de la solicitud se calcula de otra forma en `reg_sol` (línea 154).
 
-**Prioridad de corrección:** Media.
+**Impacto:** genera ruido visual y confusión en quien lee el código, haciéndole creer que existe un mecanismo contador activo.
 
+**Riesgo de mantenimiento:** bajo.
 
+**Prioridad:** Baja. Se corrige eliminando la variable.
 
-## Etapa-Diagnostico
-PENDIENTE
+---
+
+### Smell 12: Datos duplicados (desnormalización)
+
+**Ubicación:** `agregar`, línea 163.
+
+**Evidencia:**
+
+```python
+            "nombre_est": nom + " " + ape,
+```
+
+El nombre completo del estudiante se guarda copiado dentro de cada solicitud, además de estar en la lista de estudiantes, en lugar de obtenerse a partir del legajo.
+
+**Impacto:** si un estudiante actualiza sus datos personales (nombre o apellido), las solicitudes ya cargadas mantienen el nombre viejo, generando datos inconsistentes. También es la razón por la que `agregar` necesita recibir `nom` y `ape` por separado (Smell 3).
+
+**Riesgo de mantenimiento:** medio.
+
+**Prioridad:** Media. Se corrige guardando solo el legajo y buscando el estudiante cuando se necesita su nombre.
