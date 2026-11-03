@@ -108,7 +108,7 @@ Legajo del estudiante: Tipos de solicitud:
 3. Reclamo de nota
 4. Cambio de comision
 5. Otro
-Tipo: Descripcion: Solicitud registrada con ID 3 - Prioridad: Media
+Tipo: Descripcion: Solicitud registrada con ID 4 - Prioridad: Media
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud
@@ -124,7 +124,7 @@ Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 3 solicitud
     Reclamo por nota del parcial
 #3 | <fecha> | Ana Lopez (1001) | Otro | Baja | Pendiente | Sin asignar
     Consulta sobre inscripcion
-#3 | <fecha> | Ana Lopez (1001) | Equivalencia | Media | Pendiente | Sin asignar
+#4 | <fecha> | Ana Lopez (1001) | Equivalencia | Media | Pendiente | Sin asignar
     Equivalencia de Matematica I
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====

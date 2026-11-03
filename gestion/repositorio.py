@@ -87,7 +87,8 @@ class RepositorioEnMemoria(Repositorio):
         self.guardar()
 
     def siguiente_id_solicitud(self):
-        return len(self._solicitudes) + 1
+        # se usa el mayor ID y no la cantidad: si se elimino una solicitud, la cantidad repite un ID
+        return max((s.id for s in self._solicitudes), default=0) + 1
 
     def guardar(self):
         pass

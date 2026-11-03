@@ -54,6 +54,16 @@ class TestRegistro(BaseServicio):
         self.assertIsNone(solicitud.id_responsable)
         self.assertEqual(solicitud.fecha, "01/11/2026")
 
+    def test_id_no_se_repite_despues_de_eliminar(self):
+        primera = self.nueva_solicitud()
+        segunda = self.nueva_solicitud()
+        tercera = self.nueva_solicitud()
+        self.servicio.eliminar_solicitud(segunda)
+        nueva = self.nueva_solicitud()
+        self.assertEqual(nueva.id, 4)
+        ids = [s.id for s in self.repositorio.listar_solicitudes()]
+        self.assertEqual(ids, [primera.id, tercera.id, nueva.id])
+
     def test_descripcion_corta(self):
         with self.assertRaisesRegex(ErrorDeNegocio, "al menos 10"):
             self.nueva_solicitud(descripcion="corta")
