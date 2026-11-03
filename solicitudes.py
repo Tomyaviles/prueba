@@ -6,7 +6,11 @@ import os
 from datetime import datetime
 
 ARCHIVO = "datos.json"
-cont = 0  # contador de solicitudes
+
+
+def guardar(d):
+    with open(ARCHIVO, "w") as f:
+        json.dump(d, f, indent=2)
 
 
 def cargar():
@@ -22,9 +26,7 @@ def cargar():
             ],
             "solicitudes": [],
         }
-        f = open(ARCHIVO, "w")
-        json.dump(d, f, indent=2)
-        f.close()
+        guardar(d)
         return d
     try:
         f = open(ARCHIVO, "r")
@@ -59,6 +61,22 @@ def nom_prio(p):
     if p == 3:
         return "Alta"
     return "?"
+
+
+def calcular_prioridad(tipo, desc):
+    if tipo == "Reclamo de nota":
+        p = 3
+    elif tipo == "Equivalencia":
+        p = 2
+    elif tipo == "Cambio de comision":
+        p = 2
+    elif tipo == "Certificado":
+        p = 1
+    else:
+        p = 1
+    if "urgente" in desc.lower():
+        p = 3
+    return p
 
 
 class Sistema:
@@ -97,31 +115,71 @@ class Sistema:
             else:
                 print("Opcion incorrecta")
 
+    def buscar_estudiante(self, leg):
+        for e in self.d["estudiantes"]:
+            if e["legajo"] == leg:
+                return e
+        return None
+
+    def buscar_solicitud(self, id):
+        for s in self.d["solicitudes"]:
+            if s["id"] == id:
+                return s
+        return None
+
+    def buscar_responsable(self, id):
+        for r in self.d["responsables"]:
+            if r["id"] == id:
+                return r
+        return None
+
+    def pedir_id_solicitud(self):
+        try:
+            return int(input("ID de la solicitud: "))
+        except:
+            print("error")
+            return None
+
     def reg_sol(self):
         print("--- Registrar solicitud ---")
         leg = input("Legajo del estudiante: ")
-        est = None
-        for e in self.d["estudiantes"]:
-            if e["legajo"] == leg:
-                est = e
+        est = self.buscar_estudiante(leg)
         if est == None:
-            r = input("El estudiante no existe. Desea registrarlo? (s/n): ")
-            if r == "s" or r == "S":
-                n = input("Nombre: ")
-                a = input("Apellido: ")
-                em = input("Email: ")
-                c = input("Carrera: ")
-                if leg == "" or n == "" or a == "":
-                    print("Datos invalidos")
-                    return
-                if not "@" in em:
-                    print("Email invalido")
-                    return
-                est = {"legajo": leg, "nombre": n, "apellido": a, "email": em, "carrera": c}
-                self.d["estudiantes"].append(est)
-            else:
-                print("Operacion cancelada")
+            est = self.registrar_estudiante(leg)
+            if est == None:
                 return
+        tipo = self.pedir_tipo()
+        if tipo == None:
+            return
+        desc = self.pedir_descripcion()
+        if desc == None:
+            return
+        p = calcular_prioridad(tipo, desc)
+        id = len(self.d["solicitudes"]) + 1
+        fecha = datetime.now().strftime("%d/%m/%Y")
+        self.agregar(id, leg, est["nombre"], est["apellido"], tipo, desc, p, "P", None, fecha)
+        print("Solicitud registrada con ID " + str(id) + " - Prioridad: " + nom_prio(p))
+
+    def registrar_estudiante(self, leg):
+        r = input("El estudiante no existe. Desea registrarlo? (s/n): ")
+        if r != "s" and r != "S":
+            print("Operacion cancelada")
+            return None
+        n = input("Nombre: ")
+        a = input("Apellido: ")
+        em = input("Email: ")
+        c = input("Carrera: ")
+        if leg == "" or n == "" or a == "":
+            print("Datos invalidos")
+            return None
+        if not "@" in em:
+            print("Email invalido")
+            return None
+        est = {"legajo": leg, "nombre": n, "apellido": a, "email": em, "carrera": c}
+        self.d["estudiantes"].append(est)
+        return est
+
+    def pedir_tipo(self):
         print("Tipos de solicitud:")
         for i in range(len(self.tipos)):
             print(str(i + 1) + ". " + self.tipos[i])
@@ -129,32 +187,18 @@ class Sistema:
             t = int(input("Tipo: "))
         except:
             print("error")
-            return
+            return None
         if t < 1 or t > 5:
             print("Tipo invalido")
-            return
-        tipo = self.tipos[t - 1]
+            return None
+        return self.tipos[t - 1]
+
+    def pedir_descripcion(self):
         desc = input("Descripcion: ")
         if len(desc) < 10:
             print("La descripcion debe tener al menos 10 caracteres")
-            return
-        # calculo de prioridad
-        if tipo == "Reclamo de nota":
-            p = 3
-        elif tipo == "Equivalencia":
-            p = 2
-        elif tipo == "Cambio de comision":
-            p = 2
-        elif tipo == "Certificado":
-            p = 1
-        else:
-            p = 1
-        if "urgente" in desc.lower():
-            p = 3
-        id = len(self.d["solicitudes"]) + 1
-        fecha = datetime.now().strftime("%d/%m/%Y")
-        self.agregar(id, leg, est["nombre"], est["apellido"], tipo, desc, p, "P", None, fecha)
-        print("Solicitud registrada con ID " + str(id) + " - Prioridad: " + nom_prio(p))
+            return None
+        return desc
 
     def agregar(self, id, leg, nom, ape, tipo, desc, prio, est, resp, fecha):
         s = {
@@ -169,22 +213,14 @@ class Sistema:
             "fecha": fecha,
         }
         self.d["solicitudes"].append(s)
-        # guardo
-        f = open(ARCHIVO, "w")
-        json.dump(self.d, f, indent=2)
-        f.close()
+        guardar(self.d)
 
     def cambiar_estado(self):
         print("--- Cambiar estado ---")
-        try:
-            id = int(input("ID de la solicitud: "))
-        except:
-            print("error")
+        id = self.pedir_id_solicitud()
+        if id == None:
             return
-        s = None
-        for x in self.d["solicitudes"]:
-            if x["id"] == id:
-                s = x
+        s = self.buscar_solicitud(id)
         if s == None:
             print("No existe la solicitud")
             return
@@ -208,24 +244,17 @@ class Sistema:
                 ok = True
         if ok:
             s["estado"] = n
-            f = open(ARCHIVO, "w")
-            json.dump(self.d, f, indent=2)
-            f.close()
+            guardar(self.d)
             print("Estado actualizado a " + nom_est(n))
         else:
             print("Transicion no permitida de " + nom_est(s["estado"]) + " a " + nom_est(n))
 
     def asignar(self):
         print("--- Asignar responsable ---")
-        try:
-            id = int(input("ID de la solicitud: "))
-        except:
-            print("error")
+        id = self.pedir_id_solicitud()
+        if id == None:
             return
-        s = None
-        for x in self.d["solicitudes"]:
-            if x["id"] == id:
-                s = x
+        s = self.buscar_solicitud(id)
         if s == None:
             print("No existe la solicitud")
             return
@@ -239,19 +268,13 @@ class Sistema:
         except:
             print("error")
             return
-        enc = False
-        for r in self.d["responsables"]:
-            if r["id"] == rid:
-                enc = True
-                s["resp"] = rid
-                nombre = r["nombre"]
-        if enc == False:
+        r = self.buscar_responsable(rid)
+        if r == None:
             print("Responsable inexistente")
             return
-        f = open(ARCHIVO, "w")
-        json.dump(self.d, f, indent=2)
-        f.close()
-        print("Responsable " + nombre + " asignado a la solicitud " + str(id))
+        s["resp"] = rid
+        guardar(self.d)
+        print("Responsable " + r["nombre"] + " asignado a la solicitud " + str(id))
 
     def buscar(self):
         print("--- Buscar solicitudes (Enter para omitir un filtro) ---")
@@ -266,9 +289,9 @@ class Sistema:
             print(str(len(res)) + " solicitud(es) encontrada(s):")
             for s in res:
                 resp = "Sin asignar"
-                for x in self.d["responsables"]:
-                    if x["id"] == s["resp"]:
-                        resp = x["nombre"]
+                x = self.buscar_responsable(s["resp"])
+                if x != None:
+                    resp = x["nombre"]
                 print("#" + str(s["id"]) + " | " + s["fecha"] + " | " + s["nombre_est"] + " (" + s["legajo"] + ") | " + s["tipo"] + " | " + nom_prio(s["prioridad"]) + " | " + nom_est(s["estado"]) + " | " + resp)
                 print("    " + s["desc"])
 
@@ -333,22 +356,18 @@ class Sistema:
 
     def eliminar(self):
         print("--- Eliminar solicitud ---")
-        try:
-            id = int(input("ID de la solicitud: "))
-        except:
-            print("error")
+        id = self.pedir_id_solicitud()
+        if id == None:
             return
-        for s in self.d["solicitudes"]:
-            if s["id"] == id:
-                c = input("Seguro que desea eliminarla? (s/n): ")
-                if c == "s":
-                    self.d["solicitudes"].remove(s)
-                    f = open(ARCHIVO, "w")
-                    json.dump(self.d, f, indent=2)
-                    f.close()
-                    print("Solicitud eliminada")
-                return
-        print("No existe la solicitud")
+        s = self.buscar_solicitud(id)
+        if s == None:
+            print("No existe la solicitud")
+            return
+        c = input("Seguro que desea eliminarla? (s/n): ")
+        if c == "s":
+            self.d["solicitudes"].remove(s)
+            guardar(self.d)
+            print("Solicitud eliminada")
 
 
 if __name__ == "__main__":
