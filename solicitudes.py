@@ -1,58 +1,19 @@
 # Sistema de Gestion de Solicitudes Academicas - v1
 # TODO: ordenar esto algun dia
 
-import json
-import os
 from datetime import datetime
 
 from gestion.modelo import (TIPOS, LARGO_MINIMO_DESCRIPCION, Estado, Estudiante, FiltroSolicitud,
-                            Responsable, Solicitud, calcular_prioridad)
+                            Solicitud, calcular_prioridad)
+from gestion.repositorio import ErrorDeDatos, RepositorioJSON
 
 ARCHIVO = "datos.json"
-
-RESPONSABLES_INICIALES = [
-    Responsable(1, "Laura Gomez", "Alumnado"),
-    Responsable(2, "Martin Ruiz", "Secretaria Academica"),
-    Responsable(3, "Sofia Herrera", "Tesoreria"),
-    Responsable(4, "Diego Paz", "Bedelia"),
-]
-
-
-def guardar(estudiantes, responsables, solicitudes):
-    d = {
-        "estudiantes": [e.a_dict() for e in estudiantes],
-        "responsables": [r.a_dict() for r in responsables],
-        "solicitudes": [s.a_dict() for s in solicitudes],
-    }
-    with open(ARCHIVO, "w") as f:
-        json.dump(d, f, indent=2)
-
-
-def cargar():
-    # si no existe el archivo lo creo con los responsables
-    if not os.path.exists(ARCHIVO):
-        responsables = list(RESPONSABLES_INICIALES)
-        guardar([], responsables, [])
-        return [], responsables, []
-    try:
-        f = open(ARCHIVO, "r")
-        d = json.load(f)
-        f.close()
-        return ([Estudiante.desde_dict(e) for e in d["estudiantes"]],
-                [Responsable.desde_dict(r) for r in d["responsables"]],
-                [Solicitud.desde_dict(s) for s in d["solicitudes"]])
-    except:
-        print("error")
-        return [], [], []
 
 
 class Sistema:
 
-    def __init__(self):
-        self.estudiantes, self.responsables, self.solicitudes = cargar()
-
-    def guardar(self):
-        guardar(self.estudiantes, self.responsables, self.solicitudes)
+    def __init__(self, repositorio):
+        self.repo = repositorio
 
     def menu(self):
         while True:
@@ -84,24 +45,6 @@ class Sistema:
             else:
                 print("Opcion incorrecta")
 
-    def buscar_estudiante(self, leg):
-        for e in self.estudiantes:
-            if e.legajo == leg:
-                return e
-        return None
-
-    def buscar_solicitud(self, id):
-        for s in self.solicitudes:
-            if s.id == id:
-                return s
-        return None
-
-    def buscar_responsable(self, id):
-        for r in self.responsables:
-            if r.id == id:
-                return r
-        return None
-
     def pedir_id_solicitud(self):
         try:
             return int(input("ID de la solicitud: "))
@@ -112,7 +55,7 @@ class Sistema:
     def reg_sol(self):
         print("--- Registrar solicitud ---")
         leg = input("Legajo del estudiante: ")
-        est = self.buscar_estudiante(leg)
+        est = self.repo.buscar_estudiante(leg)
         if est == None:
             est = self.registrar_estudiante(leg)
             if est == None:
@@ -124,14 +67,14 @@ class Sistema:
         if desc == None:
             return
         s = Solicitud(
-            id=len(self.solicitudes) + 1,
+            id=self.repo.siguiente_id_solicitud(),
             legajo=leg,
             tipo=tipo,
             descripcion=desc,
             prioridad=calcular_prioridad(tipo, desc),
             fecha=datetime.now().strftime("%d/%m/%Y"),
         )
-        self.agregar(s)
+        self.repo.agregar_solicitud(s)
         print("Solicitud registrada con ID " + str(s.id) + " - Prioridad: " + s.prioridad.nombre)
 
     def registrar_estudiante(self, leg):
@@ -150,7 +93,7 @@ class Sistema:
             print("Email invalido")
             return None
         est = Estudiante(leg, n, a, em, c)
-        self.estudiantes.append(est)
+        self.repo.agregar_estudiante(est)
         return est
 
     def pedir_tipo(self):
@@ -174,16 +117,12 @@ class Sistema:
             return None
         return desc
 
-    def agregar(self, solicitud):
-        self.solicitudes.append(solicitud)
-        self.guardar()
-
     def cambiar_estado(self):
         print("--- Cambiar estado ---")
         id = self.pedir_id_solicitud()
         if id == None:
             return
-        s = self.buscar_solicitud(id)
+        s = self.repo.buscar_solicitud(id)
         if s == None:
             print("No existe la solicitud")
             return
@@ -199,7 +138,7 @@ class Sistema:
             print("No se puede pasar a En proceso sin responsable asignado")
             return
         s.estado = nuevo
-        self.guardar()
+        self.repo.guardar()
         print("Estado actualizado a " + nuevo.nombre)
 
     def asignar(self):
@@ -207,26 +146,26 @@ class Sistema:
         id = self.pedir_id_solicitud()
         if id == None:
             return
-        s = self.buscar_solicitud(id)
+        s = self.repo.buscar_solicitud(id)
         if s == None:
             print("No existe la solicitud")
             return
         if s.esta_finalizada():
             print("No se puede asignar responsable a una solicitud finalizada")
             return
-        for r in self.responsables:
+        for r in self.repo.listar_responsables():
             print(str(r.id) + " - " + r.nombre + " (" + r.area + ")")
         try:
             rid = int(input("ID del responsable: "))
         except:
             print("error")
             return
-        r = self.buscar_responsable(rid)
+        r = self.repo.buscar_responsable(rid)
         if r == None:
             print("Responsable inexistente")
             return
         s.id_responsable = rid
-        self.guardar()
+        self.repo.guardar()
         print("Responsable " + r.nombre + " asignado a la solicitud " + str(id))
 
     def buscar(self):
@@ -244,20 +183,20 @@ class Sistema:
             print(str(len(res)) + " solicitud(es) encontrada(s):")
             for s in res:
                 resp = "Sin asignar"
-                x = self.buscar_responsable(s.id_responsable)
+                x = self.repo.buscar_responsable(s.id_responsable)
                 if x != None:
                     resp = x.nombre
-                est = self.buscar_estudiante(s.legajo)
+                est = self.repo.buscar_estudiante(s.legajo)
                 nombre = est.nombre_completo if est else "?"
                 print("#" + str(s.id) + " | " + s.fecha + " | " + nombre + " (" + s.legajo + ") | " + s.tipo + " | " + s.prioridad.nombre + " | " + s.estado.nombre + " | " + resp)
                 print("    " + s.descripcion)
 
     def filtrar(self, filtro):
-        return [s for s in self.solicitudes if filtro.acepta(s)]
+        return [s for s in self.repo.listar_solicitudes() if filtro.acepta(s)]
 
     def reporte(self):
         print("--- Reporte de solicitudes ---")
-        sols = self.solicitudes
+        sols = self.repo.listar_solicitudes()
         print("Total de solicitudes: " + str(len(sols)))
         cantidad = {estado: 0 for estado in Estado}
         for s in sols:
@@ -278,17 +217,21 @@ class Sistema:
         id = self.pedir_id_solicitud()
         if id == None:
             return
-        s = self.buscar_solicitud(id)
+        s = self.repo.buscar_solicitud(id)
         if s == None:
             print("No existe la solicitud")
             return
         c = input("Seguro que desea eliminarla? (s/n): ")
         if c == "s":
-            self.solicitudes.remove(s)
-            self.guardar()
+            self.repo.eliminar_solicitud(s)
             print("Solicitud eliminada")
 
 
 if __name__ == "__main__":
-    s = Sistema()
+    repo = RepositorioJSON(ARCHIVO)
+    try:
+        repo.cargar()
+    except ErrorDeDatos:
+        print("error")
+    s = Sistema(repo)
     s.menu()
