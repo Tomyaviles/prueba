@@ -154,7 +154,7 @@ class MenuConsola:
         try:
             return int(input(mensaje))
         except ValueError:
-            print("error")
+            print("Debe ingresar un numero")
             return None
 
     def _mostrar_solicitud(self, solicitud):

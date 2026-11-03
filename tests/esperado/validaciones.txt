@@ -47,7 +47,7 @@ Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre
 3. Reclamo de nota
 4. Cambio de comision
 5. Otro
-Tipo: error
+Tipo: Debe ingresar un numero
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud
@@ -113,7 +113,7 @@ Opcion: Opcion incorrecta
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Cambiar estado ---
-ID de la solicitud: error
+ID de la solicitud: Debe ingresar un numero
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud

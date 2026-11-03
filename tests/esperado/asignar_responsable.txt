@@ -25,7 +25,7 @@ Tipo: Descripcion: Solicitud registrada con ID 1 - Prioridad: Alta
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Asignar responsable ---
-ID de la solicitud: error
+ID de la solicitud: Debe ingresar un numero
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud
@@ -66,7 +66,7 @@ ID de la solicitud: 1 - Laura Gomez (Alumnado)
 2 - Martin Ruiz (Secretaria Academica)
 3 - Sofia Herrera (Tesoreria)
 4 - Diego Paz (Bedelia)
-ID del responsable: error
+ID del responsable: Debe ingresar un numero
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud

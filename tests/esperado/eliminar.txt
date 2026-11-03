@@ -59,7 +59,7 @@ Tipo: Descripcion: Solicitud registrada con ID 3 - Prioridad: Baja
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Eliminar solicitud ---
-ID de la solicitud: error
+ID de la solicitud: Debe ingresar un numero
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud
