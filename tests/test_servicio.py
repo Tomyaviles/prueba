@@ -176,6 +176,12 @@ class TestBusquedaYReporte(BaseServicio):
         self.assertEqual(self.servicio.filtrar(FiltroSolicitud(responsable="1")), [self.certificado])
         self.assertEqual(self.servicio.filtrar(FiltroSolicitud(estado="P", prioridad="1")), [])
 
+    def test_filtro_con_texto_donde_va_un_numero(self):
+        with self.assertRaisesRegex(ErrorDeNegocio, "Prioridad invalida"):
+            self.servicio.filtrar(FiltroSolicitud(prioridad="alta"))
+        with self.assertRaisesRegex(ErrorDeNegocio, "ID de responsable invalido"):
+            self.servicio.filtrar(FiltroSolicitud(responsable="Laura"))
+
     def test_reporte(self):
         reporte = self.servicio.generar_reporte()
         self.assertEqual(reporte.total, 2)

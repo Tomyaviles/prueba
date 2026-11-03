@@ -101,6 +101,7 @@ class ServicioSolicitudes:
         self._repositorio.eliminar_solicitud(solicitud)
 
     def filtrar(self, filtro):
+        filtro.validar()
         return [s for s in self._repositorio.listar_solicitudes() if filtro.acepta(s)]
 
     # --- responsables y reporte ---

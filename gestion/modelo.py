@@ -171,23 +171,19 @@ class FiltroSolicitud:
     prioridad: str = ""
     responsable: str = ""
 
+    def validar(self):
+        if self.prioridad and not self.prioridad.isdigit():
+            raise ErrorDeNegocio("Prioridad invalida")
+        if self.responsable and not self.responsable.isdigit():
+            raise ErrorDeNegocio("ID de responsable invalido")
+
     def acepta(self, solicitud):
         if self.estado and solicitud.estado.value != self.estado:
             return False
         if self.tipo and self.tipo.lower() not in solicitud.tipo.lower():
             return False
-        if not _coincide_numero(self.prioridad, solicitud.prioridad):
+        if self.prioridad and solicitud.prioridad != int(self.prioridad):
             return False
-        if not _coincide_numero(self.responsable, solicitud.id_responsable):
+        if self.responsable and solicitud.id_responsable != int(self.responsable):
             return False
-        return True
-
-
-def _coincide_numero(texto, valor):
-    # si el texto no es un numero el filtro se ignora, igual que en la version inicial
-    if not texto:
-        return True
-    try:
-        return valor == int(texto)
-    except ValueError:
         return True

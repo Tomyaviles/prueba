@@ -175,15 +175,7 @@ Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 1 solicitud
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Buscar solicitudes (Enter para omitir un filtro) ---
-Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 4 solicitud(es) encontrada(s):
-#1 | <fecha> | Ana Lopez (1001) | Reclamo de nota | Alta | En proceso | Martin Ruiz
-    Reclamo por nota del parcial
-#2 | <fecha> | Juan Perez (2002) | Certificado | Baja | Pendiente | Sin asignar
-    Certificado de alumno regular
-#3 | <fecha> | Juan Perez (2002) | Equivalencia | Media | Pendiente | Sin asignar
-    Equivalencia de Matematica I
-#4 | <fecha> | Ana Lopez (1001) | Cambio de comision | Media | Pendiente | Sin asignar
-    Cambio de comision por trabajo
+Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: Prioridad invalida
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud
