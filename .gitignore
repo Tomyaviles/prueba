@@ -1,3 +1,4 @@
 datos.json
 __pycache__/
 *.pyc
+datos.json.tmp

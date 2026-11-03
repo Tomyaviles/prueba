@@ -59,6 +59,20 @@ class TestRepositorioJSON(unittest.TestCase):
         repositorio.cargar()
         self.assertEqual(repositorio.buscar_solicitud(1).prioridad, Prioridad.ALTA)
 
+    def test_cambio_de_estado_queda_guardado(self):
+        repositorio = RepositorioJSON(self.ruta)
+        repositorio.cargar()
+        solicitud = Solicitud(1, "1001", "Certificado", "Certificado de alumno regular",
+                              Prioridad.BAJA, "01/11/2026")
+        repositorio.agregar_solicitud(solicitud)
+        solicitud.estado = Estado.RECHAZADA
+        repositorio.actualizar_solicitud(solicitud)
+
+        otro = RepositorioJSON(self.ruta)
+        otro.cargar()
+        self.assertEqual(otro.buscar_solicitud(1).estado, Estado.RECHAZADA)
+        self.assertFalse(os.path.exists(self.ruta + ".tmp"))
+
     def test_archivo_danado(self):
         with open(self.ruta, "w") as archivo:
             archivo.write("{esto no es json")

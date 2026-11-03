@@ -42,14 +42,14 @@ class Repositorio(ABC):
     def agregar_solicitud(self, solicitud): ...
 
     @abstractmethod
+    def actualizar_solicitud(self, solicitud):
+        """Hace permanente un cambio de estado o de responsable."""
+
+    @abstractmethod
     def eliminar_solicitud(self, solicitud): ...
 
     @abstractmethod
     def siguiente_id_solicitud(self): ...
-
-    @abstractmethod
-    def guardar(self):
-        """Hace permanentes los cambios hechos sobre los objetos."""
 
 
 class RepositorioEnMemoria(Repositorio):
@@ -80,18 +80,21 @@ class RepositorioEnMemoria(Repositorio):
 
     def agregar_solicitud(self, solicitud):
         self._solicitudes.append(solicitud)
-        self.guardar()
+        self._persistir()
+
+    def actualizar_solicitud(self, solicitud):
+        self._persistir()
 
     def eliminar_solicitud(self, solicitud):
         self._solicitudes.remove(solicitud)
-        self.guardar()
+        self._persistir()
 
     def siguiente_id_solicitud(self):
         # se usa el mayor ID y no la cantidad: si se elimino una solicitud, la cantidad repite un ID
         return max((s.id for s in self._solicitudes), default=0) + 1
 
-    def guardar(self):
-        pass
+    def _persistir(self):
+        """En memoria no hay nada que escribir. Las subclases lo redefinen."""
 
 
 class RepositorioJSON(RepositorioEnMemoria):
@@ -105,7 +108,7 @@ class RepositorioJSON(RepositorioEnMemoria):
         """Lee el archivo. Si no existe lo crea con los responsables iniciales."""
         if not os.path.exists(self._ruta):
             self._responsables = list(RESPONSABLES_INICIALES)
-            self.guardar()
+            self._persistir()
             return
         try:
             with open(self._ruta, "r") as archivo:
@@ -119,11 +122,15 @@ class RepositorioJSON(RepositorioEnMemoria):
         self._responsables = responsables
         self._solicitudes = solicitudes
 
-    def guardar(self):
+    def _persistir(self):
         datos = {
             "estudiantes": [e.a_dict() for e in self._estudiantes],
             "responsables": [r.a_dict() for r in self._responsables],
             "solicitudes": [s.a_dict() for s in self._solicitudes],
         }
-        with open(self._ruta, "w") as archivo:
+        # se escribe en un archivo aparte y despues se reemplaza: si el programa se corta
+        # a mitad de la escritura, datos.json queda como estaba y no a medio escribir
+        temporal = self._ruta + ".tmp"
+        with open(temporal, "w") as archivo:
             json.dump(datos, archivo, indent=2)
+        os.replace(temporal, self._ruta)

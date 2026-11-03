@@ -84,7 +84,7 @@ class ServicioSolicitudes:
         if nuevo_estado == Estado.EN_PROCESO and solicitud.id_responsable is None:
             raise ErrorDeNegocio("No se puede pasar a En proceso sin responsable asignado")
         solicitud.estado = nuevo_estado
-        self._repositorio.guardar()
+        self._repositorio.actualizar_solicitud(solicitud)
 
     def verificar_que_admite_responsable(self, solicitud):
         if solicitud.esta_finalizada():
@@ -96,7 +96,7 @@ class ServicioSolicitudes:
         if responsable is None:
             raise ErrorDeNegocio("Responsable inexistente")
         solicitud.id_responsable = responsable.id
-        self._repositorio.guardar()
+        self._repositorio.actualizar_solicitud(solicitud)
         return responsable
 
     def eliminar_solicitud(self, solicitud):
