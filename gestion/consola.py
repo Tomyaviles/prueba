@@ -133,7 +133,7 @@ class MenuConsola:
         apellido = input("Apellido: ")
         email = input("Email: ")
         carrera = input("Carrera: ")
-        return self._servicio.registrar_estudiante(legajo, nombre, apellido, email, carrera)
+        return self._servicio.crear_estudiante(legajo, nombre, apellido, email, carrera)
 
     def _pedir_tipo(self):
         print("Tipos de solicitud:")

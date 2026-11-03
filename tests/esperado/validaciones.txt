@@ -58,7 +58,7 @@ Tipo: error
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Registrar solicitud ---
-Legajo del estudiante: Tipos de solicitud:
+Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre: Apellido: Email: Carrera: Tipos de solicitud:
 1. Certificado
 2. Equivalencia
 3. Reclamo de nota
@@ -75,13 +75,24 @@ Tipo: Tipo invalido
 6. Eliminar solicitud
 0. Salir
 Opcion: --- Registrar solicitud ---
-Legajo del estudiante: Tipos de solicitud:
+Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre: Apellido: Email: Carrera: Tipos de solicitud:
 1. Certificado
 2. Equivalencia
 3. Reclamo de nota
 4. Cambio de comision
 5. Otro
 Tipo: Descripcion: La descripcion debe tener al menos 10 caracteres
+
+===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+1. Registrar solicitud
+2. Cambiar estado de solicitud
+3. Asignar responsable
+4. Buscar / filtrar solicitudes
+5. Reporte
+6. Eliminar solicitud
+0. Salir
+Opcion: --- Registrar solicitud ---
+Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Operacion cancelada
 
 ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
 1. Registrar solicitud

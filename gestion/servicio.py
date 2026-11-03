@@ -30,14 +30,13 @@ class ServicioSolicitudes:
     def buscar_estudiante(self, legajo):
         return self._repositorio.buscar_estudiante(legajo)
 
-    def registrar_estudiante(self, legajo, nombre, apellido, email, carrera):
+    def crear_estudiante(self, legajo, nombre, apellido, email, carrera):
+        """Valida los datos y arma el estudiante. Se guarda recien cuando se registra su solicitud."""
         if not legajo or not nombre or not apellido:
             raise ErrorDeNegocio("Datos invalidos")
         if "@" not in email:
             raise ErrorDeNegocio("Email invalido")
-        estudiante = Estudiante(legajo, nombre, apellido, email, carrera)
-        self._repositorio.agregar_estudiante(estudiante)
-        return estudiante
+        return Estudiante(legajo, nombre, apellido, email, carrera)
 
     def nombre_del_estudiante(self, legajo):
         estudiante = self._repositorio.buscar_estudiante(legajo)
@@ -56,6 +55,8 @@ class ServicioSolicitudes:
 
     def registrar_solicitud(self, estudiante, tipo, descripcion):
         self.validar_descripcion(descripcion)
+        if self._repositorio.buscar_estudiante(estudiante.legajo) is None:
+            self._repositorio.agregar_estudiante(estudiante)
         solicitud = Solicitud(
             id=self._repositorio.siguiente_id_solicitud(),
             legajo=estudiante.legajo,

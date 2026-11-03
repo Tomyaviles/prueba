@@ -21,7 +21,7 @@ class BaseServicio(unittest.TestCase):
     def setUp(self):
         self.repositorio = RepositorioEnMemoria(responsables=RESPONSABLES)
         self.servicio = ServicioSolicitudes(self.repositorio, obtener_fecha=lambda: "01/11/2026")
-        self.ana = self.servicio.registrar_estudiante("1001", "Ana", "Lopez", "ana@mail.com", "TUP")
+        self.ana = self.servicio.crear_estudiante("1001", "Ana", "Lopez", "ana@mail.com", "TUP")
 
     def nueva_solicitud(self, tipo="Certificado", descripcion="Certificado de alumno regular"):
         return self.servicio.registrar_solicitud(self.ana, tipo, descripcion)
@@ -69,13 +69,24 @@ class TestRegistro(BaseServicio):
             self.nueva_solicitud(descripcion="corta")
         self.assertEqual(self.repositorio.listar_solicitudes(), [])
 
+    def test_estudiante_nuevo_se_guarda_con_su_primera_solicitud(self):
+        self.assertIsNone(self.repositorio.buscar_estudiante("1001"))
+        self.nueva_solicitud()
+        self.assertEqual(self.repositorio.buscar_estudiante("1001"), self.ana)
+
+    def test_estudiante_nuevo_no_se_guarda_si_la_solicitud_falla(self):
+        juan = self.servicio.crear_estudiante("2002", "Juan", "Perez", "juan@mail.com", "TUP")
+        with self.assertRaises(ErrorDeNegocio):
+            self.servicio.registrar_solicitud(juan, "Certificado", "corta")
+        self.assertIsNone(self.repositorio.buscar_estudiante("2002"))
+
     def test_estudiante_con_datos_vacios(self):
         with self.assertRaisesRegex(ErrorDeNegocio, "Datos invalidos"):
-            self.servicio.registrar_estudiante("2002", "", "Perez", "juan@mail.com", "TUP")
+            self.servicio.crear_estudiante("2002", "", "Perez", "juan@mail.com", "TUP")
 
     def test_email_sin_arroba(self):
         with self.assertRaisesRegex(ErrorDeNegocio, "Email invalido"):
-            self.servicio.registrar_estudiante("2002", "Juan", "Perez", "juanmail.com", "TUP")
+            self.servicio.crear_estudiante("2002", "Juan", "Perez", "juanmail.com", "TUP")
 
     def test_tipo_fuera_de_rango(self):
         for numero in (0, 6, -1):
