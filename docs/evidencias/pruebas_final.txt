@@ -1,0 +1,44 @@
+Suite completa sobre la version final. Comando: python -m unittest discover tests -v
+
+test_archivo_danado_no_se_pisa (test_comportamiento.TestComportamiento.test_archivo_danado_no_se_pisa) ... ok
+test_asignar_responsable (test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (test_comportamiento.TestComportamiento.test_validaciones) ... ok
+test_archivo_danado (test_repositorio.TestRepositorioJSON.test_archivo_danado) ... ok
+test_cambio_de_estado_queda_guardado (test_repositorio.TestRepositorioJSON.test_cambio_de_estado_queda_guardado) ... ok
+test_lee_archivo_de_la_version_inicial (test_repositorio.TestRepositorioJSON.test_lee_archivo_de_la_version_inicial) ... ok
+test_lo_guardado_se_recupera (test_repositorio.TestRepositorioJSON.test_lo_guardado_se_recupera) ... ok
+test_primera_vez_crea_archivo_con_responsables (test_repositorio.TestRepositorioJSON.test_primera_vez_crea_archivo_con_responsables) ... ok
+test_asigna_responsable (test_servicio.TestAsignacion.test_asigna_responsable) ... ok
+test_no_se_asigna_a_finalizadas (test_servicio.TestAsignacion.test_no_se_asigna_a_finalizadas) ... ok
+test_responsable_inexistente (test_servicio.TestAsignacion.test_responsable_inexistente) ... ok
+test_filtro_con_estado_inexistente (test_servicio.TestBusquedaYReporte.test_filtro_con_estado_inexistente) ... ok
+test_filtro_con_texto_donde_va_un_numero (test_servicio.TestBusquedaYReporte.test_filtro_con_texto_donde_va_un_numero) ... ok
+test_filtro_vacio_devuelve_todas (test_servicio.TestBusquedaYReporte.test_filtro_vacio_devuelve_todas) ... ok
+test_filtros_combinados (test_servicio.TestBusquedaYReporte.test_filtros_combinados) ... ok
+test_reporte (test_servicio.TestBusquedaYReporte.test_reporte) ... ok
+test_reporte_sin_solicitudes (test_servicio.TestBusquedaYReporte.test_reporte_sin_solicitudes) ... ok
+test_prioridad_segun_tipo (test_servicio.TestPrioridad.test_prioridad_segun_tipo) ... ok
+test_urgente_pasa_a_alta_sin_importar_mayusculas (test_servicio.TestPrioridad.test_urgente_pasa_a_alta_sin_importar_mayusculas) ... ok
+test_descripcion_corta (test_servicio.TestRegistro.test_descripcion_corta) ... ok
+test_email_sin_arroba (test_servicio.TestRegistro.test_email_sin_arroba) ... ok
+test_estudiante_con_datos_vacios (test_servicio.TestRegistro.test_estudiante_con_datos_vacios) ... ok
+test_estudiante_nuevo_no_se_guarda_si_la_solicitud_falla (test_servicio.TestRegistro.test_estudiante_nuevo_no_se_guarda_si_la_solicitud_falla) ... ok
+test_estudiante_nuevo_se_guarda_con_su_primera_solicitud (test_servicio.TestRegistro.test_estudiante_nuevo_se_guarda_con_su_primera_solicitud) ... ok
+test_id_no_se_repite_despues_de_eliminar (test_servicio.TestRegistro.test_id_no_se_repite_despues_de_eliminar) ... ok
+test_registra_con_estado_pendiente_y_sin_responsable (test_servicio.TestRegistro.test_registra_con_estado_pendiente_y_sin_responsable) ... ok
+test_tipo_fuera_de_rango (test_servicio.TestRegistro.test_tipo_fuera_de_rango) ... ok
+test_tipo_inexistente (test_servicio.TestRegistro.test_tipo_inexistente) ... ok
+test_codigo_inexistente (test_servicio.TestTransiciones.test_codigo_inexistente) ... ok
+test_en_proceso_requiere_responsable (test_servicio.TestTransiciones.test_en_proceso_requiere_responsable) ... ok
+test_todas_las_combinaciones (test_servicio.TestTransiciones.test_todas_las_combinaciones) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests
+
+OK

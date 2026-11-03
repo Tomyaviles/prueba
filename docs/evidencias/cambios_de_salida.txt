@@ -1,0 +1,166 @@
+Cambios en la salida esperada entre la version inicial (16f742d) y la version final.
+Son los unicos cambios de comportamiento externo y todos son correcciones intencionales
+(ver docs/pruebas.md, seccion 'Cambios de comportamiento intencionales').
+Comando: git diff 16f742d HEAD -- tests/casos tests/esperado
+
+diff --git a/tests/casos/validaciones.txt b/tests/casos/validaciones.txt
+index 198a7ac..ca829a9 100644
+--- a/tests/casos/validaciones.txt
++++ b/tests/casos/validaciones.txt
+@@ -25,11 +25,24 @@ TUP
+ abc
+ 1
+ 2002
++s
++Juan
++Perez
++juan@mail.com
++TUP
+ 9
+ 1
+ 2002
++s
++Juan
++Perez
++juan@mail.com
++TUP
+ 1
+ corta
++1
++2002
++n
+ 9
+ 2
+ abc
+diff --git a/tests/esperado/asignar_responsable.txt b/tests/esperado/asignar_responsable.txt
+index afa3294..28a18e3 100644
+--- a/tests/esperado/asignar_responsable.txt
++++ b/tests/esperado/asignar_responsable.txt
+@@ -25,7 +25,7 @@ Tipo: Descripcion: Solicitud registrada con ID 1 - Prioridad: Alta
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Asignar responsable ---
+-ID de la solicitud: error
++ID de la solicitud: Debe ingresar un numero
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+@@ -66,7 +66,7 @@ ID de la solicitud: 1 - Laura Gomez (Alumnado)
+ 2 - Martin Ruiz (Secretaria Academica)
+ 3 - Sofia Herrera (Tesoreria)
+ 4 - Diego Paz (Bedelia)
+-ID del responsable: error
++ID del responsable: Debe ingresar un numero
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+diff --git a/tests/esperado/buscar.txt b/tests/esperado/buscar.txt
+index d9439de..f04e9fa 100644
+--- a/tests/esperado/buscar.txt
++++ b/tests/esperado/buscar.txt
+@@ -175,15 +175,7 @@ Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 1 solicitud
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Buscar solicitudes (Enter para omitir un filtro) ---
+-Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 4 solicitud(es) encontrada(s):
+-#1 | <fecha> | Ana Lopez (1001) | Reclamo de nota | Alta | En proceso | Martin Ruiz
+-    Reclamo por nota del parcial
+-#2 | <fecha> | Juan Perez (2002) | Certificado | Baja | Pendiente | Sin asignar
+-    Certificado de alumno regular
+-#3 | <fecha> | Juan Perez (2002) | Equivalencia | Media | Pendiente | Sin asignar
+-    Equivalencia de Matematica I
+-#4 | <fecha> | Ana Lopez (1001) | Cambio de comision | Media | Pendiente | Sin asignar
+-    Cambio de comision por trabajo
++Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: Prioridad invalida
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+diff --git a/tests/esperado/eliminar.txt b/tests/esperado/eliminar.txt
+index a9a9c3e..0e1ab0c 100644
+--- a/tests/esperado/eliminar.txt
++++ b/tests/esperado/eliminar.txt
+@@ -59,7 +59,7 @@ Tipo: Descripcion: Solicitud registrada con ID 3 - Prioridad: Baja
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Eliminar solicitud ---
+-ID de la solicitud: error
++ID de la solicitud: Debe ingresar un numero
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+@@ -108,7 +108,7 @@ Legajo del estudiante: Tipos de solicitud:
+ 3. Reclamo de nota
+ 4. Cambio de comision
+ 5. Otro
+-Tipo: Descripcion: Solicitud registrada con ID 3 - Prioridad: Media
++Tipo: Descripcion: Solicitud registrada con ID 4 - Prioridad: Media
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+@@ -124,7 +124,7 @@ Estado (P/E/R/C/X): Tipo (texto): Prioridad (1/2/3): ID responsable: 3 solicitud
+     Reclamo por nota del parcial
+ #3 | <fecha> | Ana Lopez (1001) | Otro | Baja | Pendiente | Sin asignar
+     Consulta sobre inscripcion
+-#3 | <fecha> | Ana Lopez (1001) | Equivalencia | Media | Pendiente | Sin asignar
++#4 | <fecha> | Ana Lopez (1001) | Equivalencia | Media | Pendiente | Sin asignar
+     Equivalencia de Matematica I
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+diff --git a/tests/esperado/validaciones.txt b/tests/esperado/validaciones.txt
+index 61faaa4..6e05131 100644
+--- a/tests/esperado/validaciones.txt
++++ b/tests/esperado/validaciones.txt
+@@ -47,7 +47,7 @@ Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre
+ 3. Reclamo de nota
+ 4. Cambio de comision
+ 5. Otro
+-Tipo: error
++Tipo: Debe ingresar un numero
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+@@ -58,7 +58,7 @@ Tipo: error
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Registrar solicitud ---
+-Legajo del estudiante: Tipos de solicitud:
++Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre: Apellido: Email: Carrera: Tipos de solicitud:
+ 1. Certificado
+ 2. Equivalencia
+ 3. Reclamo de nota
+@@ -75,7 +75,7 @@ Tipo: Tipo invalido
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Registrar solicitud ---
+-Legajo del estudiante: Tipos de solicitud:
++Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Nombre: Apellido: Email: Carrera: Tipos de solicitud:
+ 1. Certificado
+ 2. Equivalencia
+ 3. Reclamo de nota
+@@ -83,6 +83,17 @@ Legajo del estudiante: Tipos de solicitud:
+ 5. Otro
+ Tipo: Descripcion: La descripcion debe tener al menos 10 caracteres
+ 
++===== SISTEMA DE SOLICITUDES ACADEMICAS =====
++1. Registrar solicitud
++2. Cambiar estado de solicitud
++3. Asignar responsable
++4. Buscar / filtrar solicitudes
++5. Reporte
++6. Eliminar solicitud
++0. Salir
++Opcion: --- Registrar solicitud ---
++Legajo del estudiante: El estudiante no existe. Desea registrarlo? (s/n): Operacion cancelada
++
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud
+ 2. Cambiar estado de solicitud
+@@ -102,7 +113,7 @@ Opcion: Opcion incorrecta
+ 6. Eliminar solicitud
+ 0. Salir
+ Opcion: --- Cambiar estado ---
+-ID de la solicitud: error
++ID de la solicitud: Debe ingresar un numero
+ 
+ ===== SISTEMA DE SOLICITUDES ACADEMICAS =====
+ 1. Registrar solicitud

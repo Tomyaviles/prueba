@@ -1,0 +1,94 @@
+Pruebas de caja negra (tests/test_comportamiento.py) corridas sobre cada commit de la refactorizacion.
+En todos los casos se usaron los resultados esperados grabados con la version inicial (commit 16f742d).
+Comando: python -m unittest tests.test_comportamiento -v
+
+==================================================================
+Commit 16f742d Pruebas de comportamiento de la version inicial
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+
+==================================================================
+Commit e4f75dd Refactoring 1: Extract Method (guardar, busquedas por ID y partes de reg_sol), elimina codigo muerto
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+
+==================================================================
+Commit 5199939 Refactoring 2: Enum para estados y prioridades, tablas en lugar de cadenas if/elif (OCP)
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+
+==================================================================
+Commit 2484a67 Refactoring 3: Introduce Parameter Object (clases del modelo y FiltroSolicitud), quita nombre duplicado en la solicitud
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+
+==================================================================
+Commit 5a4ac2b Refactoring 4: Move Method de la persistencia a RepositorioJSON detras de una interfaz Repositorio (DIP)
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+
+==================================================================
+Commit 1ae8882 Refactoring 5: Move Method de reglas a ServicioSolicitudes y de la consola a MenuConsola (SRP), nombres claros y excepciones especificas
+==================================================================
+test_asignar_responsable (tests.test_comportamiento.TestComportamiento.test_asignar_responsable) ... ok
+test_buscar (tests.test_comportamiento.TestComportamiento.test_buscar) ... ok
+test_eliminar (tests.test_comportamiento.TestComportamiento.test_eliminar) ... ok
+test_persistencia (tests.test_comportamiento.TestComportamiento.test_persistencia) ... ok
+test_registro_y_prioridad (tests.test_comportamiento.TestComportamiento.test_registro_y_prioridad) ... ok
+test_reporte (tests.test_comportamiento.TestComportamiento.test_reporte) ... ok
+test_transiciones_estado (tests.test_comportamiento.TestComportamiento.test_transiciones_estado) ... ok
+test_validaciones (tests.test_comportamiento.TestComportamiento.test_validaciones) ... ok
+----------------------------------------------------------------------
+Ran 8 tests
+OK
+

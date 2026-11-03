@@ -1,0 +1,158 @@
+Analisis estatico con radon 6.0.1 y pyflakes 4.1.0 (Python 3.13)
+cc = complejidad ciclomatica por funcion (A: 1-5, B: 6-10, C: 11-20)
+mi = indice de mantenibilidad (0 a 100, A: mas de 19)
+
+############ VERSION INICIAL (tag estado-inicial) ############
+
+--- radon cc -s -a solicitudes.py
+solicitudes.py
+    M 100:4 Sistema.reg_sol - C (20)
+    M 177:4 Sistema.cambiar_estado - C (15)
+    M 297:4 Sistema.reporte - C (14)
+    M 218:4 Sistema.asignar - C (12)
+    M 275:4 Sistema.filtrar - C (12)
+    C 64:0 Sistema - B (10)
+    M 70:4 Sistema.menu - B (9)
+    F 39:0 nom_est - B (6)
+    M 256:4 Sistema.buscar - A (5)
+    M 334:4 Sistema.eliminar - A (5)
+    F 54:0 nom_prio - A (4)
+    F 12:0 cargar - A (3)
+    M 66:4 Sistema.__init__ - A (1)
+    M 159:4 Sistema.agregar - A (1)
+
+14 blocks (classes, functions, methods) analyzed.
+Average complexity: B (8.357142857142858)
+
+--- radon mi -s solicitudes.py
+solicitudes.py - B (15.33)
+
+--- radon raw -s solicitudes.py (total)
+** Total **
+    LOC: 356
+    LLOC: 313
+    SLOC: 328
+    Comments: 7
+    Single comments: 6
+    Multi: 0
+    Blank: 22
+
+############ VERSION FINAL ############
+
+--- radon cc -s -a solicitudes.py gestion
+solicitudes.py
+    F 15:0 main - A (2)
+gestion\consola.py
+    M 20:4 MenuConsola.iniciar - A (5)
+    M 101:4 MenuConsola.mostrar_reporte - A (5)
+    M 45:4 MenuConsola.registrar_solicitud - A (4)
+    M 71:4 MenuConsola.asignar_responsable - A (4)
+    C 6:0 MenuConsola - A (3)
+    M 60:4 MenuConsola.cambiar_estado - A (3)
+    M 85:4 MenuConsola.buscar - A (3)
+    M 115:4 MenuConsola.eliminar - A (3)
+    M 138:4 MenuConsola._pedir_tipo - A (3)
+    M 36:4 MenuConsola._mostrar_menu - A (2)
+    M 127:4 MenuConsola._registrar_estudiante - A (2)
+    M 147:4 MenuConsola._pedir_solicitud - A (2)
+    M 153:4 MenuConsola._pedir_numero - A (2)
+    M 8:4 MenuConsola.__init__ - A (1)
+    M 160:4 MenuConsola._mostrar_solicitud - A (1)
+gestion\modelo.py
+    C 167:0 FiltroSolicitud - B (9)
+    M 182:4 FiltroSolicitud.acepta - B (9)
+    M 174:4 FiltroSolicitud.validar - B (7)
+    C 12:0 Estado - A (3)
+    M 134:4 Solicitud.es_urgente_sin_atender - A (3)
+    F 76:0 calcular_prioridad - A (2)
+    M 24:4 Estado.desde_codigo - A (2)
+    C 52:0 Prioridad - A (2)
+    C 83:0 Estudiante - A (2)
+    C 104:0 Responsable - A (2)
+    C 118:0 Solicitud - A (2)
+    C 8:0 ErrorDeNegocio - A (1)
+    M 20:4 Estado.nombre - A (1)
+    M 58:4 Prioridad.nombre - A (1)
+    M 91:4 Estudiante.nombre_completo - A (1)
+    M 94:4 Estudiante.a_dict - A (1)
+    M 99:4 Estudiante.desde_dict - A (1)
+    M 109:4 Responsable.a_dict - A (1)
+    M 113:4 Responsable.desde_dict - A (1)
+    M 128:4 Solicitud.esta_finalizada - A (1)
+    M 131:4 Solicitud.puede_pasar_a - A (1)
+    M 140:4 Solicitud.a_dict - A (1)
+    M 153:4 Solicitud.desde_dict - A (1)
+gestion\repositorio.py
+    M 107:4 RepositorioJSON.cargar - B (6)
+    C 100:0 RepositorioJSON - A (5)
+    M 58:4 RepositorioEnMemoria.__init__ - A (4)
+    M 125:4 RepositorioJSON._persistir - A (4)
+    M 63:4 RepositorioEnMemoria.buscar_estudiante - A (3)
+    M 72:4 RepositorioEnMemoria.buscar_responsable - A (3)
+    M 78:4 RepositorioEnMemoria.buscar_solicitud - A (3)
+    C 21:0 Repositorio - A (2)
+    C 55:0 RepositorioEnMemoria - A (2)
+    M 92:4 RepositorioEnMemoria.siguiente_id_solicitud - A (2)
+    C 17:0 ErrorDeDatos - A (1)
+    M 24:4 Repositorio.buscar_estudiante - A (1)
+    M 27:4 Repositorio.agregar_estudiante - A (1)
+    M 30:4 Repositorio.listar_responsables - A (1)
+    M 33:4 Repositorio.buscar_responsable - A (1)
+    M 36:4 Repositorio.listar_solicitudes - A (1)
+    M 39:4 Repositorio.buscar_solicitud - A (1)
+    M 42:4 Repositorio.agregar_solicitud - A (1)
+    M 45:4 Repositorio.actualizar_solicitud - A (1)
+    M 49:4 Repositorio.eliminar_solicitud - A (1)
+    M 52:4 Repositorio.siguiente_id_solicitud - A (1)
+    M 66:4 RepositorioEnMemoria.agregar_estudiante - A (1)
+    M 69:4 RepositorioEnMemoria.listar_responsables - A (1)
+    M 75:4 RepositorioEnMemoria.listar_solicitudes - A (1)
+    M 81:4 RepositorioEnMemoria.agregar_solicitud - A (1)
+    M 85:4 RepositorioEnMemoria.actualizar_solicitud - A (1)
+    M 88:4 RepositorioEnMemoria.eliminar_solicitud - A (1)
+    M 96:4 RepositorioEnMemoria._persistir - A (1)
+    M 103:4 RepositorioJSON.__init__ - A (1)
+gestion\servicio.py
+    M 118:4 ServicioSolicitudes.generar_reporte - B (6)
+    M 33:4 ServicioSolicitudes.crear_estudiante - A (5)
+    M 79:4 ServicioSolicitudes.cambiar_estado - A (5)
+    C 22:0 ServicioSolicitudes - A (3)
+    M 47:4 ServicioSolicitudes.tipo_por_numero - A (3)
+    M 56:4 ServicioSolicitudes.registrar_solicitud - A (3)
+    M 105:4 ServicioSolicitudes.filtrar - A (3)
+    M 41:4 ServicioSolicitudes.nombre_del_estudiante - A (2)
+    M 52:4 ServicioSolicitudes.validar_descripcion - A (2)
+    M 73:4 ServicioSolicitudes.obtener_solicitud - A (2)
+    M 89:4 ServicioSolicitudes.verificar_que_admite_responsable - A (2)
+    M 93:4 ServicioSolicitudes.asignar_responsable - A (2)
+    M 114:4 ServicioSolicitudes.nombre_del_responsable - A (2)
+    F 10:0 fecha_de_hoy - A (1)
+    C 15:0 Reporte - A (1)
+    M 24:4 ServicioSolicitudes.__init__ - A (1)
+    M 30:4 ServicioSolicitudes.buscar_estudiante - A (1)
+    M 102:4 ServicioSolicitudes.eliminar_solicitud - A (1)
+    M 111:4 ServicioSolicitudes.listar_responsables - A (1)
+
+87 blocks (classes, functions, methods) analyzed.
+Average complexity: A (2.2873563218390807)
+
+--- radon mi -s solicitudes.py gestion
+solicitudes.py - A (93.17)
+gestion\consola.py - A (39.90)
+gestion\modelo.py - A (41.04)
+gestion\repositorio.py - A (47.09)
+gestion\servicio.py - A (44.02)
+gestion\__init__.py - A (100.00)
+
+--- radon raw -s solicitudes.py gestion (total)
+** Total **
+    LOC: 651
+    LLOC: 475
+    SLOC: 490
+    Comments: 14
+    Single comments: 29
+    Multi: 3
+    Blank: 129
+
+--- pyflakes solicitudes.py gestion tests (sin salida = sin advertencias)
+(fin)
