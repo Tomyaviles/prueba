@@ -54,6 +54,8 @@ class ServicioSolicitudes:
             raise ErrorDeNegocio(f"La descripcion debe tener al menos {LARGO_MINIMO_DESCRIPCION} caracteres")
 
     def registrar_solicitud(self, estudiante, tipo, descripcion):
+        if tipo not in TIPOS:
+            raise ErrorDeNegocio("Tipo invalido")
         self.validar_descripcion(descripcion)
         if self._repositorio.buscar_estudiante(estudiante.legajo) is None:
             self._repositorio.agregar_estudiante(estudiante)

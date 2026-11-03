@@ -88,6 +88,11 @@ class TestRegistro(BaseServicio):
         with self.assertRaisesRegex(ErrorDeNegocio, "Email invalido"):
             self.servicio.crear_estudiante("2002", "Juan", "Perez", "juanmail.com", "TUP")
 
+    def test_tipo_inexistente(self):
+        with self.assertRaisesRegex(ErrorDeNegocio, "Tipo invalido"):
+            self.nueva_solicitud(tipo="Pedido de beca")
+        self.assertEqual(self.repositorio.listar_solicitudes(), [])
+
     def test_tipo_fuera_de_rango(self):
         for numero in (0, 6, -1):
             with self.subTest(numero=numero):
@@ -175,6 +180,10 @@ class TestBusquedaYReporte(BaseServicio):
         self.assertEqual(self.servicio.filtrar(FiltroSolicitud(prioridad="3")), [self.reclamo])
         self.assertEqual(self.servicio.filtrar(FiltroSolicitud(responsable="1")), [self.certificado])
         self.assertEqual(self.servicio.filtrar(FiltroSolicitud(estado="P", prioridad="1")), [])
+
+    def test_filtro_con_estado_inexistente(self):
+        with self.assertRaisesRegex(ErrorDeNegocio, "Estado invalido"):
+            self.servicio.filtrar(FiltroSolicitud(estado="Z"))
 
     def test_filtro_con_texto_donde_va_un_numero(self):
         with self.assertRaisesRegex(ErrorDeNegocio, "Prioridad invalida"):

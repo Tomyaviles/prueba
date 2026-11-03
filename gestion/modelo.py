@@ -172,6 +172,8 @@ class FiltroSolicitud:
     responsable: str = ""
 
     def validar(self):
+        if self.estado and Estado.desde_codigo(self.estado) is None:
+            raise ErrorDeNegocio("Estado invalido")
         if self.prioridad and not self.prioridad.isdigit():
             raise ErrorDeNegocio("Prioridad invalida")
         if self.responsable and not self.responsable.isdigit():
